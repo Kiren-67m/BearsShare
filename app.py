@@ -10,9 +10,10 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
 import pantrysoft_mock
 import email_sender
+import config
 
 app = Flask(__name__)
-app.secret_key = "bears-share-demo-secret"   # only needed for session storage
+app.secret_key = config.SECRET_KEY
 
 
 @app.route("/")

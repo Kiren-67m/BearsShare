@@ -7,18 +7,19 @@ A local demo application built for **Missouri State University's Bear Pantry** t
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
-2. [How It Works](#2-how-it-works)
-3. [Project Structure](#3-project-structure)
-4. [File-by-File Reference](#4-file-by-file-reference)
-5. [Setup & Installation](#5-setup--installation)
-6. [Running the App](#6-running-the-app)
-7. [Using Mailtrap (Email Testing)](#7-using-mailtrap-email-testing)
-8. [Using Gmail (Alternative)](#8-using-gmail-alternative)
-9. [Going to Production (MSU SMTP)](#9-going-to-production-msu-smtp)
-10. [Mock Data Reference](#10-mock-data-reference)
-11. [Email Format](#11-email-format)
-12. [Replacing PantrySoft Mock with Real API](#12-replacing-pantrysoft-mock-with-real-api)
-13. [Troubleshooting](#13-troubleshooting)
+2. [Deployment](#2-deployment)
+3. [How It Works](#3-how-it-works)
+4. [Project Structure](#4-project-structure)
+5. [File-by-File Reference](#5-file-by-file-reference)
+6. [Setup & Installation](#6-setup--installation)
+7. [Running the App](#7-running-the-app)
+8. [Using Mailtrap (Email Testing)](#8-using-mailtrap-email-testing)
+9. [Using Gmail (Alternative)](#9-using-gmail-alternative)
+10. [Going to Production (MSU SMTP)](#10-going-to-production-msu-smtp)
+11. [Mock Data Reference](#11-mock-data-reference)
+12. [Email Format](#12-email-format)
+13. [Replacing PantrySoft Mock with Real API](#13-replacing-pantrysoft-mock-with-real-api)
+14. [Troubleshooting](#14-troubleshooting)
 
 ---
 
@@ -41,7 +42,37 @@ A local demo application built for **Missouri State University's Bear Pantry** t
 
 ---
 
-## 2. How It Works
+## 2. Deployment
+
+### Live Demo
+This app is deployed on Render: **[insert URL after deployment]**
+
+### Environment Variables (required for production)
+Set these in your Render dashboard under Environment:
+
+| Variable | Description |
+|----------|-------------|
+| `SMTP_USER` | Gmail address used to send notifications |
+| `SMTP_PASSWORD` | Gmail App Password (16-character) |
+| `SECRET_KEY` | Flask session secret key (any random string) |
+
+### Deploy to Render
+1. Push code to GitHub
+2. Create a new Web Service on Render, connect to this repository
+3. Set Build Command: `pip install -r requirements.txt`
+4. Set Start Command: `gunicorn app:app`
+5. Add environment variables above in the Render dashboard
+6. Deploy
+
+### Going to Production (MSU)
+When MSU IT provides SMTP credentials, update environment variables:
+- `SMTP_USER` → `BearPantry@missouristate.edu`
+- `SMTP_PASSWORD` → MSU SMTP password
+- Update `SMTP_SERVER` and `SMTP_PORT` in `config.py` if MSU uses different settings
+
+---
+
+## 3. How It Works
 
 ```
 Staff fills form  →  Flask /send route  →  pantrysoft_mock.py  →  mock_users.json
@@ -67,7 +98,7 @@ Staff fills form  →  Flask /send route  →  pantrysoft_mock.py  →  mock_use
 
 ---
 
-## 3. Project Structure
+## 4. Project Structure
 
 ```
 bears_share/
@@ -85,7 +116,7 @@ bears_share/
 
 ---
 
-## 4. File-by-File Reference
+## 5. File-by-File Reference
 
 ### `app.py` — Flask Application
 
@@ -223,7 +254,7 @@ Shown after successful form submission. Displays:
 
 ---
 
-## 5. Setup & Installation
+## 6. Setup & Installation
 
 ### Prerequisites
 
@@ -255,7 +286,7 @@ pip install flask
 
 ---
 
-## 6. Running the App
+## 7. Running the App
 
 ```bash
 # Make sure the virtual environment is active
@@ -277,7 +308,7 @@ To stop the server: press `Ctrl + C`
 
 ---
 
-## 7. Using Mailtrap (Email Testing)
+## 8. Using Mailtrap (Email Testing)
 
 Mailtrap is a free email sandbox. Emails are captured and displayed in a web inbox — nothing is delivered to real recipients. **Recommended for all demo/testing.**
 
@@ -308,7 +339,7 @@ FROM_NAME     = "Bear Pantry – Bears Share"
 
 ---
 
-## 8. Using Gmail (Alternative)
+## 9. Using Gmail (Alternative)
 
 If you prefer to use a Gmail account instead of Mailtrap:
 
@@ -333,7 +364,7 @@ FROM_NAME     = "Bear Pantry – Bears Share"
 
 ---
 
-## 9. Going to Production (MSU SMTP)
+## 10. Going to Production (MSU SMTP)
 
 When ready to deploy for real, make exactly **two changes**:
 
@@ -368,7 +399,7 @@ Everything else — `app.py`, `email_sender.py`, both templates — stays exactl
 
 ---
 
-## 10. Mock Data Reference
+## 11. Mock Data Reference
 
 To add or modify test users, edit `mock_users.json`. Each user object must have:
 
@@ -386,7 +417,7 @@ To add or modify test users, edit `mock_users.json`. Each user object must have:
 
 ---
 
-## 11. Email Format
+## 12. Email Format
 
 ### Subject line
 ```
@@ -419,7 +450,7 @@ To add or modify test users, edit `mock_users.json`. Each user object must have:
 
 ---
 
-## 12. Replacing PantrySoft Mock with Real API
+## 13. Replacing PantrySoft Mock with Real API
 
 The codebase is designed so that **only `pantrysoft_mock.py` needs to change** when connecting to real data. The contract that file must fulfill:
 
@@ -433,7 +464,7 @@ As long as this function returns a `list[str]`, the rest of the app works unchan
 
 ---
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 ### `ModuleNotFoundError: No module named 'flask'`
 The virtual environment is not active. Run:

@@ -3,7 +3,12 @@
     "allow": [
       "Bash(python3 -m venv venv)",
       "Bash(venv/bin/pip install *)",
-      "Bash(venv/bin/python3 -c ' *)"
+      "Bash(venv/bin/python3 -c ' *)",
+      "Bash(sed -i '' 's/^## 4\\\\. File-by-File Reference/## 5. File-by-File Reference/' /Users/apple/Desktop/BearShare/bears_share/README.md)",
+      "Bash(sed -i '' 's/^## 5\\\\. Setup/## 6. Setup/' /Users/apple/Desktop/BearShare/bears_share/README.md)",
+      "Bash(sed -i '' 's/^## 6\\\\. Running/## 7. Running/' /Users/apple/Desktop/BearShare/bears_share/README.md)",
+      "Bash(sed -i '' 's/^## 7\\\\. Using Mailtrap/## 8. Using Mailtrap/' /Users/apple/Desktop/BearShare/bears_share/README.md)",
+      "Bash(sed -i '' 's/^## 8\\\\. Using Gmail/## 9. Using Gmail/' /Users/apple/Desktop/BearShare/bears_share/README.md)"
     ]
   }
 }

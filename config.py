@@ -1,17 +1,15 @@
-# ─────────────────────────────────────────────
-# Bears Share – SMTP Configuration
-# ─────────────────────────────────────────────
-# DEMO: using Mailtrap (emails are captured, never delivered).
-#   Sign up free at https://mailtrap.io → Email Testing → SMTP Settings
-#   Copy your Mailtrap username/password below.
-#
-# PRODUCTION: replace with MSU SMTP settings and set
-#   FROM_EMAIL = "BearPantry@missouristate.edu"
-# ─────────────────────────────────────────────
+import os
+
+# Bears Share — SMTP Configuration
+# Credentials are loaded from environment variables (set in Render dashboard)
+# For local testing, you can temporarily hardcode values here — but never commit real credentials to Git
 
 SMTP_SERVER   = "smtp.gmail.com"
 SMTP_PORT     = 587
-SMTP_USER     = "liuqm110@gmail.com"   # ← replace
-SMTP_PASSWORD = "ehnm utss bbkv xppb"   # ← replace
-FROM_EMAIL    = "liuqm110@gmail.com"
+SMTP_USER     = os.environ.get("SMTP_USER", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+FROM_EMAIL    = os.environ.get("SMTP_USER", "")
 FROM_NAME     = "Bear Pantry – Bears Share"
+
+# Flask secret key for session management
+SECRET_KEY    = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
