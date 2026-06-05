@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bears Share – Submit Food Notification</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #F5F5F5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 560px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: #5E0009;
+      color: #fff;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .card-header h1 { font-size: 24px; margin-bottom: 4px; }
+    .card-header p  { font-size: 14px; opacity: 0.85; }
+
+    .card-body { padding: 32px; }
+
+    .intro-box {
+      background: #fdf5f5;
+      border-left: 4px solid #5E0009;
+      border-radius: 0 6px 6px 0;
+      padding: 12px 16px;
+      margin-bottom: 28px;
+      font-size: 13.5px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .error-box {
+      background: #fde8e8;
+      border: 1px solid #f5c2c2;
+      color: #a33;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+      transition: border-color 0.2s;
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #5E0009;
+      box-shadow: 0 0 0 3px rgba(94,0,9,0.12);
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: -14px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: #5E0009;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #8B0012; }
+
+    .form-footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-top: 14px;
+    }
+
+    .card-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      padding: 16px 32px 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>🐻 Bears Share</h1>
+      <p>Notify students about available food</p>
+    </div>
+    <div class="card-body">
+      <div class="intro-box">
+        Use this form to notify all Bears Share subscribers about available food
+        from a campus catering event. Emails will be sent immediately upon submission.
+      </div>
+
+      {% if error %}
+        <div class="error-box">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="/send">
+        <label for="location">Building Name</label>
+        <input type="text" id="location" name="location"
+               placeholder="e.g. Plaster Student Union" required>
+
+        <label for="room">Room Number</label>
+        <input type="text" id="room" name="room"
+               placeholder="e.g. Room 203" required>
+
+        <label for="food">What food is available?</label>
+        <textarea id="food" name="food"
+                  placeholder="e.g. Pizza, salad, bottled water, desserts..." required></textarea>
+
+        <label for="end_time">Food Available Until</label>
+        <input type="datetime-local" id="end_time" name="end_time" required>
+        <p class="field-hint">Students have 20 minutes after this time to pick up food.</p>
+
+        <label for="notes">Additional Notes <span style="font-weight:normal;color:#999;">(Optional)</span></label>
+        <textarea id="notes" name="notes"
+                  placeholder="e.g. Vegetarian options available, nut-free, etc."></textarea>
+
+        <button type="submit" class="btn">Send Bears Share Alert</button>
+        <p class="form-footer-note">This will notify all opted-in Bears Share subscribers immediately.</p>
+      </form>
+    </div>
+    <div class="card-footer">Missouri State University – Bear Pantry</div>
+  </div>
+</body>
+</html>

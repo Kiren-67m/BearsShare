@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bears Share – Notifications Sent!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #F5F5F5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: #2e7d32;
+      color: #fff;
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .card-header h1 { font-size: 24px; margin-bottom: 4px; }
+    .card-header p  { font-size: 14px; opacity: 0.85; }
+
+    .card-body { padding: 32px; }
+
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      flex: 1;
+      text-align: center;
+      background: #f4f0f8;
+      border-radius: 8px;
+      padding: 16px 8px;
+    }
+    .stat-box .number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #5E0009;
+    }
+    .stat-box .label {
+      font-size: 12px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    h2 {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+    }
+    td {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      color: #555;
+    }
+    td:first-child {
+      font-weight: bold;
+      color: #333;
+      width: 45%;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: #5E0009;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #8B0012; }
+
+    .contact-note {
+      text-align: center;
+      font-size: 12.5px;
+      color: #777;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+    .contact-note a { color: #5E0009; }
+
+    .card-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      padding: 16px 32px 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>✅ Notifications Sent!</h1>
+      <p>Students have been alerted about the available food</p>
+    </div>
+    <div class="card-body">
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="number">{{ summary.sent }}</div>
+          <div class="label">Emails Sent</div>
+        </div>
+        <div class="stat-box">
+          <div class="number">{{ summary.total }}</div>
+          <div class="label">Opted-In Users</div>
+        </div>
+        {% if summary.failed > 0 %}
+        <div class="stat-box">
+          <div class="number" style="color:#c0392b;">{{ summary.failed }}</div>
+          <div class="label">Failed</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <h2>Submission Summary</h2>
+      <table>
+        <tr>
+          <td>Food Available</td>
+          <td>{{ summary.food }}</td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td>{{ summary.location }}</td>
+        </tr>
+        <tr>
+          <td>Room</td>
+          <td>{{ summary.room }}</td>
+        </tr>
+        <tr>
+          <td>Available Until</td>
+          <td>{{ summary.end_time }}</td>
+        </tr>
+        {% if summary.notes %}
+        <tr>
+          <td>Additional Notes</td>
+          <td>{{ summary.notes }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td>Sent At</td>
+          <td>{{ summary.sent_at }}</td>
+        </tr>
+      </table>
+
+      <a href="/" class="btn">← Send Another Bears Share Alert</a>
+
+      <p class="contact-note">
+        If you need to contact Bears Share subscribers, email
+        <a href="mailto:BearPantry@missouristate.edu">BearPantry@missouristate.edu</a>
+      </p>
+    </div>
+    <div class="card-footer">Missouri State University – Bear Pantry</div>
+  </div>
+</body>
+</html>

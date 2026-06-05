@@ -1,0 +1,50 @@
+[
+  {
+    "id": "U001",
+    "name": "Qiming",
+    "email": "liuqm110@gmail.com",
+    "bears_share_optin": true
+  },
+  {
+    "id": "U002",
+    "name": "Kiren",
+    "email": "ql348s@missouristate.edu",
+    "bears_share_optin": true
+  },
+  {
+    "id": "U003",
+    "name": "Alice",
+    "email": "alice@gmail.com",
+    "bears_share_optin": true
+  },
+  {
+    "id": "U004",
+    "name": "David Lee",
+    "email": "david@example.com",
+    "bears_share_optin": false
+  },
+  {
+    "id": "U005",
+    "name": "Emma Chen",
+    "email": "emma@example.com",
+    "bears_share_optin": false
+  },
+  {
+    "id": "U006",
+    "name": "Frank Rivera",
+    "email": "frank@example.com",
+    "bears_share_optin": true
+  },
+  {
+    "id": "U007",
+    "name": "Grace Kim",
+    "email": "grace@example.com",
+    "bears_share_optin": true
+  },
+  {
+    "id": "U008",
+    "name": "Henry Davis",
+    "email": "henry@example.com",
+    "bears_share_optin": false
+  }
+]
