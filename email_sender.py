@@ -13,6 +13,12 @@ def build_email_body(
     food: str, location: str, room: str, end_time: str, notes: str = ""
 ) -> tuple[str, str]:
     """Returns (plain_text, html) email body."""
+    # Clean non-breaking spaces and invisible characters from all inputs
+    food     = food.replace('\xa0', ' ').strip()
+    location = location.replace('\xa0', ' ').strip()
+    room     = room.replace('\xa0', ' ').strip()
+    end_time = end_time.replace('\xa0', ' ').strip()
+    notes    = notes.replace('\xa0', ' ').strip()
 
     notes_plain = f"\n  Notes:    {notes}\n" if notes else ""
     notes_html = (
