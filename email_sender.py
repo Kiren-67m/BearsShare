@@ -107,39 +107,55 @@ def send_notification(
     subject = f"🐻 Bears Share Alert: Free food at {location}, {room} — available until {end_time}"
     plain_body, html_body = build_email_body(food, location, room, end_time, notes)
 
-    sent, failed, errors = 0, 0, []
+    errors = []
+    # Use single-element lists so the nested function can mutate these counters
+    sent_ref, failed_ref = [0], [0]
+
+    def _send_all(server):
+        for recipient in recipients:
+            try:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = subject
+                msg["From"]    = f"{config.FROM_NAME} <{config.FROM_EMAIL}>"
+                msg["To"]      = recipient
+
+                msg.attach(MIMEText(plain_body, "plain"))
+                msg.attach(MIMEText(html_body,  "html"))
+
+                server.sendmail(config.FROM_EMAIL, recipient, msg.as_string())
+                print(f"[EmailSender] ✓ Sent to {recipient}")
+                sent_ref[0] += 1
+
+            except Exception as e:
+                print(f"[EmailSender] ✗ Failed for {recipient}: {e}")
+                failed_ref[0] += 1
+                errors.append({"recipient": recipient, "error": str(e)})
+
+    port = int(config.SMTP_PORT)
 
     try:
-        with smtplib.SMTP_SSL(config.SMTP_SERVER, config.SMTP_PORT) as server:
-            server.login(config.SMTP_USER, config.SMTP_PASSWORD)
-
-            for recipient in recipients:
-                try:
-                    msg = MIMEMultipart("alternative")
-                    msg["Subject"] = subject
-                    msg["From"]    = f"{config.FROM_NAME} <{config.FROM_EMAIL}>"
-                    msg["To"]      = recipient
-
-                    msg.attach(MIMEText(plain_body, "plain"))
-                    msg.attach(MIMEText(html_body,  "html"))
-
-                    server.sendmail(config.FROM_EMAIL, recipient, msg.as_string())
-                    print(f"[EmailSender] ✓ Sent to {recipient}")
-                    sent += 1
-
-                except Exception as e:
-                    print(f"[EmailSender] ✗ Failed for {recipient}: {e}")
-                    failed += 1
-                    errors.append({"recipient": recipient, "error": str(e)})
+        if port == 465:
+            with smtplib.SMTP_SSL(config.SMTP_SERVER, port) as server:
+                server.login(config.SMTP_USER, config.SMTP_PASSWORD)
+                _send_all(server)
+        else:
+            with smtplib.SMTP(config.SMTP_SERVER, port) as server:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(config.SMTP_USER, config.SMTP_PASSWORD)
+                _send_all(server)
 
     except smtplib.SMTPAuthenticationError:
-        msg = "SMTP authentication failed – check config.py credentials."
-        print(f"[EmailSender] ERROR: {msg}")
-        return {"sent": 0, "failed": len(recipients), "errors": [{"error": msg}]}
+        err = "SMTP authentication failed – check credentials."
+        print(f"[EmailSender] ERROR: {err}")
+        return {"sent": 0, "failed": len(recipients), "errors": [{"error": err}]}
 
     except Exception as e:
         print(f"[EmailSender] SMTP connection error: {e}")
         return {"sent": 0, "failed": len(recipients), "errors": [{"error": str(e)}]}
 
+    sent   = sent_ref[0]
+    failed = failed_ref[0]
     print(f"[EmailSender] Done – {sent} sent, {failed} failed.")
     return {"sent": sent, "failed": failed, "errors": errors}
