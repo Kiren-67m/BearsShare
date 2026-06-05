@@ -3,6 +3,7 @@ email_sender.py – Sends Bears Share notification emails via SMTP.
 """
 
 import smtplib
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -123,14 +124,19 @@ def send_notification(
         for recipient in recipients:
             try:
                 msg = MIMEMultipart("alternative")
-                msg["Subject"] = subject
-                msg["From"]    = f"{config.FROM_NAME} <{config.FROM_EMAIL}>"
+                # RFC 2047-encode headers so non-ASCII chars (emoji, dashes)
+                # survive smtplib's internal .encode('ascii') call
+                msg["Subject"] = Header(subject, "utf-8")
+                from_name = config.FROM_NAME.replace('\xa0', ' ')
+                msg["From"]    = f"{from_name} <{config.FROM_EMAIL}>"
                 msg["To"]      = recipient
 
                 msg.attach(MIMEText(plain_body, "plain", "utf-8"))
                 msg.attach(MIMEText(html_body,  "html",  "utf-8"))
 
-                server.sendmail(config.FROM_EMAIL, recipient, msg.as_string())
+                # Pass bytes, not str — smtplib encodes str with ascii and
+                # crashes on any non-ASCII character (emoji, en/em dashes)
+                server.sendmail(config.FROM_EMAIL, recipient, msg.as_bytes())
                 print(f"[EmailSender] ✓ Sent to {recipient}")
                 sent_ref[0] += 1
 
