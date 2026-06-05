@@ -3,10 +3,25 @@ email_sender.py – Sends Bears Share notification emails via SMTP.
 """
 
 import smtplib
+import unicodedata
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import config
+
+
+def clean_text(text):
+    """Replace common Unicode characters that break SMTP ASCII encoding."""
+    if not text:
+        return text
+    text = text.replace('\xa0',   ' ')    # non-breaking space
+    text = text.replace('–', '-')    # en dash
+    text = text.replace('—', '--')   # em dash
+    text = text.replace('‘', "'")    # left single quote
+    text = text.replace('’', "'")    # right single quote / apostrophe
+    text = text.replace('“', '"')    # left double quote
+    text = text.replace('”', '"')    # right double quote
+    return text
 
 
 def build_email_body(
@@ -54,7 +69,7 @@ To unsubscribe, update your preferences in the pantry portal.
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 560px; margin: auto; color: #333;">
   <div style="background:#5E0009; padding:20px; border-radius:8px 8px 0 0; text-align:center;">
-    <h1 style="color:#fff; margin:0; font-size:22px;">🐻 Bears Share Alert!</h1>
+    <h1 style="color:#fff; margin:0; font-size:22px;">Bears Share Alert!</h1>
   </div>
   <div style="background:#fdf5f5; padding:24px; border-radius:0 0 8px 8px; border:1px solid #ddd;">
     <p style="font-size:16px;">Hi there,</p>
@@ -91,6 +106,8 @@ To unsubscribe, update your preferences in the pantry portal.
 </body>
 </html>
 """
+    plain = clean_text(plain)
+    html  = clean_text(html)
     return plain, html
 
 
@@ -110,8 +127,11 @@ def send_notification(
         print("[EmailSender] No recipients – nothing to send.")
         return {"sent": 0, "failed": 0, "errors": []}
 
-    subject = f"🐻 Bears Share Alert: Free food at {location}, {room} — available until {end_time}"
+    subject = f"Bears Share Alert: Free food at {location}, {room} - available until {end_time}"
     plain_body, html_body = build_email_body(food, location, room, end_time, notes)
+    # Extra safety pass in case any template string slipped through
+    plain_body = clean_text(plain_body)
+    html_body  = clean_text(html_body)
 
     errors = []
     # Use single-element lists so the nested function can mutate these counters
