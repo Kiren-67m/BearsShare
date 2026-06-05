@@ -8,7 +8,7 @@ import os
 SMTP_SERVER   = os.environ.get("SMTP_SERVER",   "smtp.gmail.com")
 SMTP_PORT     = int(os.environ.get("SMTP_PORT", "465"))
 SMTP_USER     = os.environ.get("SMTP_USER",     "")
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "").replace('\xa0', ' ').strip()
 FROM_EMAIL    = os.environ.get("SMTP_USER",     "")
 FROM_NAME     = "Bear Pantry – Bears Share"
 
