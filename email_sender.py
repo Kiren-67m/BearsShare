@@ -110,9 +110,7 @@ def send_notification(
     sent, failed, errors = 0, 0, []
 
     try:
-        with smtplib.SMTP(config.SMTP_SERVER, config.SMTP_PORT) as server:
-            server.ehlo()
-            server.starttls()
+        with smtplib.SMTP_SSL(config.SMTP_SERVER, config.SMTP_PORT) as server:
             server.login(config.SMTP_USER, config.SMTP_PASSWORD)
 
             for recipient in recipients:

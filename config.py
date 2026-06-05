@@ -5,7 +5,7 @@ import os
 # For local testing, you can temporarily hardcode values here — but never commit real credentials to Git
 
 SMTP_SERVER   = "smtp.gmail.com"
-SMTP_PORT     = 587
+SMTP_PORT     = int(os.environ.get("SMTP_PORT", "465"))
 SMTP_USER     = os.environ.get("SMTP_USER", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 FROM_EMAIL    = os.environ.get("SMTP_USER", "")
