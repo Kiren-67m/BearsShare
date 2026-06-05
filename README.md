@@ -50,11 +50,14 @@ This app is deployed on Render: **[insert URL after deployment]**
 ### Environment Variables (required for production)
 Set these in your Render dashboard under Environment:
 
-| Variable | Description |
-|----------|-------------|
-| `SMTP_USER` | Gmail address used to send notifications |
-| `SMTP_PASSWORD` | Gmail App Password (16-character) |
-| `SECRET_KEY` | Flask session secret key (any random string) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SMTP_USER` | ✅ | Gmail address used to send notifications (also becomes FROM_EMAIL) |
+| `SMTP_PASSWORD` | ✅ | Gmail App Password — enter without spaces to avoid encoding issues |
+| `SECRET_KEY` | ✅ | Flask session secret key (any random string) |
+| `SMTP_SERVER` | optional | Default: `smtp.gmail.com` |
+| `SMTP_PORT` | optional | Default: `465` (SSL). Use `587` for STARTTLS |
+| `ACCESS_CODE` | optional | If set, users must enter this code to submit the form |
 
 ### Deploy to Render
 1. Push code to GitHub
@@ -65,10 +68,11 @@ Set these in your Render dashboard under Environment:
 6. Deploy
 
 ### Going to Production (MSU)
-When MSU IT provides SMTP credentials, update environment variables:
-- `SMTP_USER` → `BearPantry@missouristate.edu`
+When MSU IT provides SMTP credentials, update environment variables in Render — no code changes needed:
+- `SMTP_USER` → `BearPantry@missouristate.edu` (FROM_EMAIL follows this automatically)
 - `SMTP_PASSWORD` → MSU SMTP password
-- Update `SMTP_SERVER` and `SMTP_PORT` in `config.py` if MSU uses different settings
+- `SMTP_SERVER` → MSU SMTP server address (if different from smtp.gmail.com)
+- `SMTP_PORT` → MSU SMTP port (`465` for SSL, `587` for STARTTLS)
 
 ---
 
@@ -106,7 +110,9 @@ bears_share/
 ├── email_sender.py       # SMTP logic, email body builder (plain + HTML)
 ├── pantrysoft_mock.py    # Simulates PantrySoft API — reads mock_users.json
 ├── mock_users.json       # 8 test users (5 opted in, 3 opted out)
-├── config.py             # SMTP credentials and sender info
+├── config.py             # SMTP config — all values from environment variables
+├── requirements.txt      # Python dependencies (flask, gunicorn)
+├── .gitignore            # Excludes venv/, credentials, .DS_Store, etc.
 ├── templates/
 │   ├── form.html         # Staff submission form
 │   └── success.html      # Confirmation page after sending
@@ -195,31 +201,35 @@ Contains 8 simulated users. 5 have `bears_share_optin: true`, 3 have `false`.
 
 | Name | Email | Opted In |
 |------|-------|----------|
-| Alice Johnson | alice@example.com | ✅ Yes |
-| Bob Martinez | bob@example.com | ✅ Yes |
-| Carol White | carol@example.com | ❌ No |
-| David Lee | david@example.com | ✅ Yes |
+| Qiming | liuqm110@gmail.com | ✅ Yes |
+| Kiren | ql348s@missouristate.edu | ✅ Yes |
+| Alice | alice@gmail.com | ✅ Yes |
+| David Lee | david@example.com | ❌ No |
 | Emma Chen | emma@example.com | ❌ No |
 | Frank Rivera | frank@example.com | ✅ Yes |
 | Grace Kim | grace@example.com | ✅ Yes |
 | Henry Davis | henry@example.com | ❌ No |
 
-Every submission should result in exactly **5 emails sent** (to Alice, Bob, David, Frank, Grace).
+Every submission should result in exactly **5 emails sent** (to Qiming, Kiren, Alice, Frank, Grace).
 
 ---
 
 ### `config.py` — SMTP Configuration
 
+All values are read from environment variables. Defaults are shown below:
+
 ```python
-SMTP_SERVER   = "sandbox.smtp.mailtrap.io"   # or smtp.gmail.com
-SMTP_PORT     = 2525                          # Mailtrap; Gmail uses 587
-SMTP_USER     = "your_username"
-SMTP_PASSWORD = "your_password"
-FROM_EMAIL    = "bearpantry-demo@example.com"
+SMTP_SERVER   = os.environ.get("SMTP_SERVER",   "smtp.gmail.com")
+SMTP_PORT     = int(os.environ.get("SMTP_PORT", "465"))   # 465=SSL, 587=STARTTLS
+SMTP_USER     = os.environ.get("SMTP_USER",     "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")       # \xa0 auto-stripped
+FROM_EMAIL    = os.environ.get("SMTP_USER",     "")       # follows SMTP_USER
 FROM_NAME     = "Bear Pantry – Bears Share"
+SECRET_KEY    = os.environ.get("SECRET_KEY",    "dev-secret-key-change-in-production")
+ACCESS_CODE   = os.environ.get("ACCESS_CODE",   "")       # optional form gate
 ```
 
-> ⚠️ **Never commit real credentials to Git.** Add `config.py` to `.gitignore` when moving to production.
+> ⚠️ **Never commit real credentials to Git.** Set all secrets as environment variables in Render (or export them locally). `config.py` itself contains no credentials.
 
 ---
 
@@ -260,7 +270,7 @@ Shown after successful form submission. Displays:
 
 - Python 3.9 or later (`python3 --version`)
 - Internet access (to reach SMTP server)
-- A free [Mailtrap](https://mailtrap.io) account (for demo email testing)
+- A Gmail account with an App Password, **or** a free [Mailtrap](https://mailtrap.io) account for sandbox testing
 
 ### Install steps
 
@@ -277,11 +287,13 @@ source venv/bin/activate
 #    Windows:
 venv\Scripts\activate
 
-# 4. Install Flask (only dependency)
-pip install flask
+# 4. Install dependencies
+pip install -r requirements.txt
 
-# 5. Configure SMTP credentials (see sections 7 or 8 below)
-#    Open config.py and fill in your SMTP_USER and SMTP_PASSWORD
+# 5. Set SMTP credentials as environment variables (see sections 8 or 9 below)
+export SMTP_USER="your.email@gmail.com"
+export SMTP_PASSWORD="your-app-password"
+export SECRET_KEY="any-random-string"
 ```
 
 ---
@@ -319,15 +331,16 @@ Mailtrap is a free email sandbox. Emails are captured and displayed in a web inb
 3. Click your inbox → **SMTP Settings** tab
 4. Select **Python** from the integration dropdown — it shows your credentials
 
-### config.py settings
+### Environment variables for Mailtrap
 
-```python
-SMTP_SERVER   = "sandbox.smtp.mailtrap.io"
-SMTP_PORT     = 2525
-SMTP_USER     = "your_mailtrap_username"   # from Mailtrap dashboard
-SMTP_PASSWORD = "your_mailtrap_password"   # from Mailtrap dashboard
-FROM_EMAIL    = "bearpantry-demo@example.com"
-FROM_NAME     = "Bear Pantry – Bears Share"
+Set these before running the app locally:
+
+```bash
+export SMTP_SERVER="sandbox.smtp.mailtrap.io"
+export SMTP_PORT="465"          # Mailtrap supports 465 (SSL)
+export SMTP_USER="your_mailtrap_username"
+export SMTP_PASSWORD="your_mailtrap_password"
+export SECRET_KEY="any-random-string"
 ```
 
 ### Verifying it works
@@ -349,16 +362,17 @@ If you prefer to use a Gmail account instead of Mailtrap:
 2. Search for **"App Passwords"** in your Google Account settings
 3. Create a new App Password for "Mail" — copy the 16-character password
 
-### config.py settings
+### Environment variables for Gmail
 
-```python
-SMTP_SERVER   = "smtp.gmail.com"
-SMTP_PORT     = 587
-SMTP_USER     = "your.email@gmail.com"
-SMTP_PASSWORD = "xxxx xxxx xxxx xxxx"   # 16-char App Password (spaces OK)
-FROM_EMAIL    = "your.email@gmail.com"
-FROM_NAME     = "Bear Pantry – Bears Share"
+```bash
+export SMTP_SERVER="smtp.gmail.com"
+export SMTP_PORT="465"                      # SSL — default; use 587 for STARTTLS
+export SMTP_USER="your.email@gmail.com"     # also becomes FROM_EMAIL automatically
+export SMTP_PASSWORD="xxxxxxxxxxxxxxxxxxxx" # 16-char App Password, spaces removed
+export SECRET_KEY="any-random-string"
 ```
+
+> **Note on port:** port `465` uses `SMTP_SSL` (default); port `587` uses `STARTTLS`. Both work with Gmail — `465` is recommended as it connects faster.
 
 > ⚠️ With Gmail, emails go to **real inboxes**. For testing, make sure `mock_users.json` contains email addresses you control, or use Mailtrap instead.
 
@@ -368,16 +382,16 @@ FROM_NAME     = "Bear Pantry – Bears Share"
 
 When ready to deploy for real, make exactly **two changes**:
 
-### Change 1 — `config.py`: switch to MSU SMTP
+### Change 1 — Update environment variables in Render (no code changes needed)
 
-```python
+```bash
 SMTP_SERVER   = "<MSU SMTP server address>"   # get from MSU IT
-SMTP_PORT     = 587                            # confirm with MSU IT
-SMTP_USER     = "<MSU email account>"
-SMTP_PASSWORD = "<MSU email password>"
-FROM_EMAIL    = "BearPantry@missouristate.edu"
-FROM_NAME     = "Bear Pantry – Bears Share"
+SMTP_PORT     = "465"                          # or 587 — confirm with MSU IT
+SMTP_USER     = "BearPantry@missouristate.edu" # FROM_EMAIL follows automatically
+SMTP_PASSWORD = "<MSU SMTP password>"
 ```
+
+`config.py` already reads all values from env vars — no file edits required.
 
 ### Change 2 — `pantrysoft_mock.py`: call the real PantrySoft API
 
@@ -479,9 +493,10 @@ venv\Scripts\activate      # Windows
 - For Mailtrap: copy credentials from the **SMTP Settings** tab of your inbox (not the API key)
 
 ### `Connection refused` / `Network unreachable`
-- Check that `SMTP_SERVER` and `SMTP_PORT` in `config.py` match your provider
-- Mailtrap: `sandbox.smtp.mailtrap.io` port `2525`
-- Gmail: `smtp.gmail.com` port `587`
+- Check that the `SMTP_SERVER` and `SMTP_PORT` env vars match your provider
+- Mailtrap: `sandbox.smtp.mailtrap.io` port `465` (or `2525`)
+- Gmail: `smtp.gmail.com` port `465` (SSL, default) or `587` (STARTTLS)
+- On Render free tier, port `587` may be blocked — use `465` instead
 
 ### Form submits but 0 emails sent
 - Check the terminal — look for `[EmailSender]` log lines
