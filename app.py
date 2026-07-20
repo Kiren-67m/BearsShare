@@ -83,6 +83,15 @@ def send():
     print(f"[App] Result: {result}")
     print("="*50 + "\n")
 
+    if result["sent"] == 0 and recipients:
+        first_error = (result["errors"][0].get("error", "unknown error")
+                       if result["errors"] else "unknown error")
+        return render_template(
+            "form.html",
+            error=f"No emails could be sent — {first_error}",
+            access_code_required=bool(config.ACCESS_CODE),
+        ), 502
+
     # ── 4. Log the broadcast ──────────────────────────────────────────
     db.log_send(
         food=food, location=location, room=room, end_time=end_time, notes=notes,

@@ -157,12 +157,14 @@ def send_notification(
     port = int(config.SMTP_PORT)
 
     try:
+        # timeout keeps a blocked/unreachable SMTP port from hanging the
+        # worker past gunicorn's 30s limit (which surfaces as a bare 500)
         if port == 465:
-            with smtplib.SMTP_SSL(config.SMTP_SERVER, port) as server:
+            with smtplib.SMTP_SSL(config.SMTP_SERVER, port, timeout=15) as server:
                 server.login(config.SMTP_USER, config.SMTP_PASSWORD)
                 _send_all(server)
         else:
-            with smtplib.SMTP(config.SMTP_SERVER, port) as server:
+            with smtplib.SMTP(config.SMTP_SERVER, port, timeout=15) as server:
                 server.ehlo()
                 server.starttls()
                 server.ehlo()
