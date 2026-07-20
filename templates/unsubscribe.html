@@ -34,15 +34,27 @@
   <div class="card">
     <div class="card-header"><h1>🐻 Bears Share</h1></div>
     <div class="card-body">
-      {% if ok %}
+      {% if ok and resubscribed %}
+        <div class="big">🎉</div>
+        <h2>Welcome back!</h2>
+        <p>
+          <span class="email">{{ email }}</span> will receive
+          Bears Share food notifications again.
+        </p>
+      {% elif ok %}
         <div class="big">✅</div>
         <h2>You're unsubscribed</h2>
         <p>
           <span class="email">{{ email }}</span> will no longer receive
           Bears Share food notifications — including after future list updates.
         </p>
-        <p style="margin-top:12px;">
-          Changed your mind? Opt back in any time through the Bear Pantry.
+        <p style="margin-top:24px;">
+          <a href="/resubscribe/{{ token }}"
+             style="display:inline-block; padding:11px 22px; background:#5E0009;
+                    color:#fff; border-radius:6px; text-decoration:none;
+                    font-weight:bold; font-size:14.5px;">
+            Clicked by mistake? Resubscribe
+          </a>
         </p>
       {% else %}
         <div class="big">⚠️</div>

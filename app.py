@@ -179,7 +179,17 @@ def unsubscribe(token):
         return render_template("unsubscribe.html", ok=False), 404
     db.suppress_email(email)
     print(f"[App] Unsubscribed: {email}")
-    return render_template("unsubscribe.html", ok=True, email=email)
+    return render_template("unsubscribe.html", ok=True, email=email, token=token)
+
+
+@app.route("/resubscribe/<token>")
+def resubscribe(token):
+    email = tokens.verify_unsubscribe_token(token)
+    if not email:
+        return render_template("unsubscribe.html", ok=False), 404
+    db.unsuppress_email(email)
+    print(f"[App] Resubscribed: {email}")
+    return render_template("unsubscribe.html", ok=True, resubscribed=True, email=email)
 
 
 @app.route("/history")

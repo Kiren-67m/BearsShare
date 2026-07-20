@@ -116,6 +116,14 @@ def suppress_email(email: str):
             session.commit()
 
 
+def unsuppress_email(email: str):
+    """Remove an email from the suppression list (undo unsubscribe)."""
+    email = email.strip().lower()
+    with Session(engine) as session:
+        session.query(Suppression).filter(Suppression.email == email).delete()
+        session.commit()
+
+
 def is_suppressed(email: str) -> bool:
     with Session(engine) as session:
         return session.scalar(
