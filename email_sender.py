@@ -8,10 +8,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import config
+import tokens
 
 
 def build_email_body(
-    food: str, location: str, room: str, end_time: str, notes: str = ""
+    food: str, location: str, room: str, end_time: str, notes: str = "",
+    unsubscribe_link: str = "",
 ) -> tuple[str, str]:
     """Returns (plain_text, html) email body."""
     # Clean non-breaking spaces from all inputs
@@ -47,7 +49,8 @@ Missouri State University
 
 ---
 You're receiving this because you opted in to Bears Share notifications.
-To unsubscribe, update your preferences in the pantry portal.
+Unsubscribe: {unsubscribe_link}
+{config.PHYSICAL_ADDRESS}
 """
 
     html = f"""\
@@ -85,7 +88,8 @@ To unsubscribe, update your preferences in the pantry portal.
     <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
     <p style="font-size:12px; color:#888;">
       You're receiving this because you opted in to Bears Share notifications.<br>
-      To unsubscribe, update your preferences in the pantry portal.
+      <a href="{unsubscribe_link}" style="color:#888;">Unsubscribe</a> at any time with one click.<br>
+      {config.PHYSICAL_ADDRESS}
     </p>
     <p style="font-size:13px; color:#5E0009; font-weight:bold;">— Bear Pantry Team, Missouri State University</p>
   </div>
@@ -114,7 +118,6 @@ def send_notification(
         return {"sent": 0, "failed": 0, "errors": []}
 
     subject = f"🐻 Bears Share Alert: Free food at {location}, {room} — available until {end_time}"
-    plain_body, html_body = build_email_body(food, location, room, end_time, notes)
 
     errors = []
     # Use single-element lists so the nested function can mutate these counters
@@ -123,6 +126,12 @@ def send_notification(
     def _send_all(server):
         for recipient in recipients:
             try:
+                # Body is built per recipient: each email carries its own
+                # signed unsubscribe link
+                plain_body, html_body = build_email_body(
+                    food, location, room, end_time, notes,
+                    unsubscribe_link=tokens.unsubscribe_url(recipient),
+                )
                 msg = MIMEMultipart("alternative")
                 # RFC 2047-encode headers so non-ASCII chars (emoji, dashes)
                 # survive smtplib's internal .encode('ascii') call

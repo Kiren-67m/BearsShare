@@ -159,6 +159,13 @@
         <textarea id="notes" name="notes"
                   placeholder="e.g. Vegetarian options available, nut-free, etc."></textarea>
 
+        {% if access_code_required %}
+          <label for="access_code">Access Code</label>
+          <input type="password" id="access_code" name="access_code"
+                 placeholder="Staff access code" required>
+          <p class="field-hint">Ask the Bear Pantry coordinator if you don't have the code.</p>
+        {% endif %}
+
         <button type="submit" class="btn">Send Bears Share Alert</button>
         <p class="form-footer-note">This will notify all opted-in Bears Share subscribers immediately.</p>
       </form>

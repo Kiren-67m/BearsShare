@@ -10,5 +10,8 @@ venv/
 # Environment / credentials
 .env
 
+# Local database
+*.db
+
 # Claude
 .claude/

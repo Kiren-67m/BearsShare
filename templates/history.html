@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bears Share – Send History</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif; background: #F5F5F5;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 40px 16px;
+    }
+    .card {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%; max-width: 760px; overflow: hidden;
+    }
+    .card-header {
+      background: #5E0009; color: #fff; padding: 28px 32px; text-align: center;
+    }
+    .card-header h1 { font-size: 24px; margin-bottom: 4px; }
+    .card-header p  { font-size: 14px; opacity: 0.85; }
+    .card-body { padding: 32px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      background: #5E0009; color: #fff; padding: 10px 12px; text-align: left;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid #eee; color: #444; }
+    tr:nth-child(even) td { background: #fdf5f5; }
+    .num-ok  { color: #2e6b31; font-weight: bold; }
+    .num-bad { color: #a33; font-weight: bold; }
+    .empty {
+      text-align: center; color: #999; padding: 40px 0; font-size: 15px;
+    }
+    .card-footer {
+      text-align: center; font-size: 12px; color: #aaa; padding: 16px 32px 24px;
+    }
+    .card-footer a { color: #5E0009; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>🐻 Send History</h1>
+      <p>Every Bears Share broadcast, most recent first</p>
+    </div>
+    <div class="card-body">
+      {% if logs %}
+        <table>
+          <tr>
+            <th>Date</th><th>Food</th><th>Location</th>
+            <th>Until</th><th>Sent</th><th>Failed</th>
+          </tr>
+          {% for log in logs %}
+            <tr>
+              <td>{{ log.created_at.strftime("%b %d, %Y %I:%M %p") }}</td>
+              <td>{{ log.food }}</td>
+              <td>{{ log.location }}{% if log.room %}, {{ log.room }}{% endif %}</td>
+              <td>{{ log.end_time }}</td>
+              <td class="num-ok">{{ log.sent }}/{{ log.total }}</td>
+              <td class="{{ 'num-bad' if log.failed else '' }}">{{ log.failed }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <div class="empty">No broadcasts yet.</div>
+      {% endif %}
+    </div>
+    <div class="card-footer">
+      <a href="/">← Send a notification</a> &nbsp;·&nbsp;
+      <a href="/subscribers">Subscriber list</a>
+    </div>
+  </div>
+</body>
+</html>

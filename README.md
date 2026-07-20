@@ -52,12 +52,24 @@ Set these in your Render dashboard under Environment:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `SMTP_USER` | ✅ | Gmail address used to send notifications (also becomes FROM_EMAIL) |
-| `SMTP_PASSWORD` | ✅ | Gmail App Password — enter without spaces to avoid encoding issues |
-| `SECRET_KEY` | ✅ | Flask session secret key (any random string) |
+| `SMTP_USER` | ✅ | Email account used to send notifications |
+| `SMTP_PASSWORD` | ✅ | App Password — enter without spaces to avoid encoding issues |
+| `SECRET_KEY` | ✅ | Flask session secret key + unsubscribe-token signing (any random string; changing it invalidates old unsubscribe links) |
+| `BASE_URL` | ✅ | Public URL of the app (e.g. `https://bearsshare.onrender.com`) — used to build unsubscribe links |
+| `DATABASE_URL` | ✅ prod | Render Postgres connection string. Without it the app uses local SQLite, which resets on every deploy |
+| `FROM_EMAIL` | optional | From address if different from `SMTP_USER` |
+| `ACCESS_CODE` | optional | If set, staff must enter this code to send a broadcast or import a CSV |
 | `SMTP_SERVER` | optional | Default: `smtp.gmail.com` |
 | `SMTP_PORT` | optional | Default: `465` (SSL). Use `587` for STARTTLS |
-| `ACCESS_CODE` | optional | If set, users must enter this code to submit the form |
+| `PHYSICAL_ADDRESS` | optional | Mailing address shown in email footers (CAN-SPAM); defaults to the Bear Pantry campus address |
+
+### New in this version
+
+- **Database (SQLAlchemy)** — SQLite locally, Postgres in production. Three tables: `subscribers`, `suppression`, `send_log`.
+- **CSV subscriber import** — upload a PantrySoft CSV export at `/subscribers` (needs a header row with an `email` column). Replaces the previous list; falls back to bundled mock data until the first import.
+- **Access code** — set `ACCESS_CODE` and the send form + CSV import require it.
+- **One-click unsubscribe** — every email carries a signed per-recipient unsubscribe link. Unsubscribed addresses go on a permanent suppression list and stay excluded even after the subscriber list is re-imported. Email footers include the physical mailing address (CAN-SPAM).
+- **Send history** — every broadcast is logged and visible at `/history`.
 
 ### Deploy to Render
 1. Push code to GitHub
