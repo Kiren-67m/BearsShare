@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bears Share – Unsubscribe</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif; background: #F5F5F5;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 40px 16px;
+    }
+    .card {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%; max-width: 480px; overflow: hidden; text-align: center;
+    }
+    .card-header {
+      background: #5E0009; color: #fff; padding: 28px 32px;
+    }
+    .card-header h1 { font-size: 24px; }
+    .card-body { padding: 40px 32px; }
+    .big { font-size: 48px; margin-bottom: 16px; }
+    h2 { font-size: 20px; color: #333; margin-bottom: 12px; }
+    p  { font-size: 14.5px; color: #666; line-height: 1.6; }
+    .email { color: #5E0009; font-weight: bold; }
+    .card-footer {
+      font-size: 12px; color: #aaa; padding: 0 32px 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header"><h1>🐻 Bears Share</h1></div>
+    <div class="card-body">
+      {% if ok %}
+        <div class="big">✅</div>
+        <h2>You're unsubscribed</h2>
+        <p>
+          <span class="email">{{ email }}</span> will no longer receive
+          Bears Share food notifications — including after future list updates.
+        </p>
+        <p style="margin-top:12px;">
+          Changed your mind? Opt back in any time through the Bear Pantry.
+        </p>
+      {% else %}
+        <div class="big">⚠️</div>
+        <h2>Invalid unsubscribe link</h2>
+        <p>
+          This link is invalid or was modified. Please use the unsubscribe
+          link at the bottom of a Bears Share email, or contact the Bear Pantry.
+        </p>
+      {% endif %}
+    </div>
+    <div class="card-footer">Missouri State University – Bear Pantry</div>
+  </div>
+</body>
+</html>

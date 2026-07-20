@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bears Share – Subscriber List</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif; background: #F5F5F5;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 40px 16px;
+    }
+    .card {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%; max-width: 560px; overflow: hidden;
+    }
+    .card-header {
+      background: #5E0009; color: #fff; padding: 28px 32px; text-align: center;
+    }
+    .card-header h1 { font-size: 24px; margin-bottom: 4px; }
+    .card-header p  { font-size: 14px; opacity: 0.85; }
+    .card-body { padding: 32px; }
+    .stats { display: flex; gap: 16px; margin-bottom: 28px; }
+    .stat {
+      flex: 1; background: #fdf5f5; border-radius: 8px;
+      padding: 16px; text-align: center;
+    }
+    .stat .num { font-size: 28px; font-weight: bold; color: #5E0009; }
+    .stat .lbl { font-size: 12px; color: #888; margin-top: 4px; }
+    .intro-box {
+      background: #fdf5f5; border-left: 4px solid #5E0009;
+      border-radius: 0 6px 6px 0; padding: 12px 16px; margin-bottom: 28px;
+      font-size: 13.5px; color: #444; line-height: 1.5;
+    }
+    .error-box {
+      background: #fde8e8; border: 1px solid #f5c2c2; color: #a33;
+      border-radius: 6px; padding: 10px 14px; margin-bottom: 20px; font-size: 14px;
+    }
+    .message-box {
+      background: #e8f5e9; border: 1px solid #b7dfb9; color: #2e6b31;
+      border-radius: 6px; padding: 10px 14px; margin-bottom: 20px; font-size: 14px;
+    }
+    label {
+      display: block; font-size: 13px; font-weight: bold;
+      color: #555; margin-bottom: 6px;
+    }
+    input[type="file"], input[type="password"] {
+      width: 100%; padding: 10px 14px; border: 1px solid #ccc;
+      border-radius: 6px; font-size: 15px; margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .btn {
+      width: 100%; padding: 13px; background: #5E0009; color: #fff;
+      border: none; border-radius: 6px; font-size: 16px; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn:hover { background: #8B0012; }
+    .card-footer {
+      text-align: center; font-size: 12px; color: #aaa; padding: 16px 32px 24px;
+    }
+    .card-footer a { color: #5E0009; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1>🐻 Subscriber List</h1>
+      <p>Import the PantrySoft CSV export</p>
+    </div>
+    <div class="card-body">
+      <div class="stats">
+        <div class="stat">
+          <div class="num">{{ subscriber_count }}</div>
+          <div class="lbl">Subscribers</div>
+        </div>
+        <div class="stat">
+          <div class="num">{{ suppressed_count }}</div>
+          <div class="lbl">Unsubscribed</div>
+        </div>
+      </div>
+
+      <div class="intro-box">
+        Export the Bears Share opt-in list from PantrySoft as a CSV (with a
+        header row containing an <strong>email</strong> column) and upload it
+        here. Uploading <strong>replaces</strong> the current list. Anyone who
+        has unsubscribed stays excluded, even after a re-import.
+        {% if subscriber_count == 0 %}
+          <br><br><em>No list imported yet — the app is running on bundled demo
+          data until the first upload.</em>
+        {% endif %}
+      </div>
+
+      {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+      {% if message %}<div class="message-box">{{ message }}</div>{% endif %}
+
+      <form method="POST" action="/subscribers" enctype="multipart/form-data">
+        <label for="csv_file">PantrySoft CSV Export</label>
+        <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+
+        {% if access_code_required %}
+          <label for="access_code">Access Code</label>
+          <input type="password" id="access_code" name="access_code"
+                 placeholder="Staff access code" required>
+        {% endif %}
+
+        <button type="submit" class="btn">Import Subscriber List</button>
+      </form>
+    </div>
+    <div class="card-footer">
+      <a href="/">← Send a notification</a> &nbsp;·&nbsp;
+      <a href="/history">Send history</a>
+    </div>
+  </div>
+</body>
+</html>
