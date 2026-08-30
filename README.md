@@ -244,16 +244,16 @@ Contains 8 simulated users. 5 have `bears_share_optin: true`, 3 have `false`.
 
 | Name | Email | Opted In |
 |------|-------|----------|
-| Qiming | liuqm110@gmail.com | ✅ Yes |
-| Kiren | ql348s@missouristate.edu | ✅ Yes |
-| Alice | alice@gmail.com | ✅ Yes |
-| David Lee | david@example.com | ❌ No |
-| Emma Chen | emma@example.com | ❌ No |
-| Frank Rivera | frank@example.com | ✅ Yes |
-| Grace Kim | grace@example.com | ✅ Yes |
-| Henry Davis | henry@example.com | ❌ No |
+| Test User 1 | user1@example.com | ✅ Yes |
+| Test User 2 | user2@example.com | ✅ Yes |
+| Test User 3 | user3@example.com | ✅ Yes |
+| Test User 4 | user4@example.com | ❌ No |
+| Test User 5 | user5@example.com | ❌ No |
+| Test User 6 | user6@example.com | ✅ Yes |
+| Test User 7 | user7@example.com | ✅ Yes |
+| Test User 8 | user8@example.com | ❌ No |
 
-Every submission should result in exactly **5 emails sent** (to Qiming, Kiren, Alice, Frank, Grace).
+Every submission should result in exactly **5 emails sent** (the five opted-in test users).
 
 ---
 

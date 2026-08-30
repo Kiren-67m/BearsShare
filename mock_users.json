@@ -1,50 +1,50 @@
 [
   {
     "id": "U001",
-    "name": "Qiming",
-    "email": "liuqm110@gmail.com",
+    "name": "Test User 1",
+    "email": "user1@example.com",
     "bears_share_optin": true
   },
   {
     "id": "U002",
-    "name": "Kiren",
-    "email": "ql348s@missouristate.edu",
+    "name": "Test User 2",
+    "email": "user2@example.com",
     "bears_share_optin": true
   },
   {
     "id": "U003",
-    "name": "Alice",
-    "email": "alice@gmail.com",
+    "name": "Test User 3",
+    "email": "user3@example.com",
     "bears_share_optin": true
   },
   {
     "id": "U004",
-    "name": "David Lee",
-    "email": "david@example.com",
+    "name": "Test User 4",
+    "email": "user4@example.com",
     "bears_share_optin": false
   },
   {
     "id": "U005",
-    "name": "Emma Chen",
-    "email": "emma@example.com",
+    "name": "Test User 5",
+    "email": "user5@example.com",
     "bears_share_optin": false
   },
   {
     "id": "U006",
-    "name": "Frank Rivera",
-    "email": "frank@example.com",
+    "name": "Test User 6",
+    "email": "user6@example.com",
     "bears_share_optin": true
   },
   {
     "id": "U007",
-    "name": "Grace Kim",
-    "email": "grace@example.com",
+    "name": "Test User 7",
+    "email": "user7@example.com",
     "bears_share_optin": true
   },
   {
     "id": "U008",
-    "name": "Henry Davis",
-    "email": "henry@example.com",
+    "name": "Test User 8",
+    "email": "user8@example.com",
     "bears_share_optin": false
   }
 ]
