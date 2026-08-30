@@ -45,7 +45,7 @@ A local demo application built for **Missouri State University's Bear Pantry** t
 ## 2. Deployment
 
 ### Live Demo
-This app is deployed on Render: **[insert URL after deployment]**
+This app is deployed on Render: **https://bearsshare.onrender.com**
 
 ### Environment Variables (required for production)
 Set these in your Render dashboard under Environment:
@@ -118,16 +118,21 @@ Staff fills form  →  Flask /send route  →  pantrysoft_mock.py  →  mock_use
 
 ```
 bears_share/
-├── app.py                # Flask app — routes, form handling, session
+├── app.py                # Flask app — 8 routes, form handling, session
 ├── email_sender.py       # SMTP logic, email body builder (plain + HTML)
-├── pantrysoft_mock.py    # Simulates PantrySoft API — reads mock_users.json
-├── mock_users.json       # 8 test users (5 opted in, 3 opted out)
-├── config.py             # SMTP config — all values from environment variables
-├── requirements.txt      # Python dependencies (flask, gunicorn)
-├── .gitignore            # Excludes venv/, credentials, .DS_Store, etc.
+├── db.py                 # SQLAlchemy data layer — subscribers, suppression, send_log
+├── tokens.py             # Signed unsubscribe tokens (itsdangerous)
+├── pantrysoft_mock.py    # Recipient source — DB if imported, else mock_users.json
+├── mock_users.json       # 8 test users (5 opted in, 3 opted out) — demo fallback
+├── config.py             # Config — all values from environment variables
+├── requirements.txt      # Python dependencies (flask, gunicorn, SQLAlchemy, psycopg2)
+├── .gitignore            # Excludes venv/, credentials, *.db, .DS_Store, etc.
 ├── templates/
 │   ├── form.html         # Staff submission form
-│   └── success.html      # Confirmation page after sending
+│   ├── success.html      # Confirmation page after sending
+│   ├── subscribers.html  # Subscriber list status + CSV upload
+│   ├── history.html      # Past-broadcast log
+│   └── unsubscribe.html  # One-click unsubscribe / resubscribe result
 ├── venv/                 # Python virtual environment (created during setup)
 └── README.md             # This file
 ```
@@ -138,13 +143,17 @@ bears_share/
 
 ### `app.py` — Flask Application
 
-The main entry point. Defines three routes:
+The main entry point. Defines eight routes:
 
 | Route | Method | Description |
 |-------|--------|-------------|
 | `/` | GET | Renders `form.html` |
-| `/send` | POST | Processes form, sends emails, stores result in session, redirects |
+| `/send` | POST | Validates access code, sends emails, logs the broadcast, redirects |
 | `/success` | GET | Reads session data, renders `success.html` |
+| `/subscribers` | GET/POST | Shows subscriber/suppressed counts; POST imports a PantrySoft CSV (replaces the list) |
+| `/unsubscribe/<token>` | GET | One-click unsubscribe — adds the email to the permanent suppression list |
+| `/resubscribe/<token>` | GET | Undo an unsubscribe — removes the email from the suppression list |
+| `/history` | GET | Renders `history.html` — log of past broadcasts |
 
 **Key behaviors:**
 - Validates that all required fields (food, location, room, end_time) are non-empty; shows inline error if not
@@ -196,14 +205,36 @@ Builds both a plain-text version and an HTML version of the email. Returns a `tu
 
 ---
 
+### `db.py` — Database Layer (SQLAlchemy)
+
+Same code runs on SQLite locally (default, auto-creates `bears_share.db`) and Postgres in production (set `DATABASE_URL`). Normalizes Render's `postgres://` URLs to `postgresql://`. Three tables:
+
+| Table | Purpose |
+|-------|---------|
+| `subscribers` | The opt-in mailing list, populated by CSV import |
+| `suppression` | Emails that clicked unsubscribe — filtered out of **every** send, permanently, even after the subscriber list is re-imported |
+| `send_log` | One row per broadcast, powering `/history` |
+
+Key functions: `replace_subscribers()` (dedupes, replaces the whole list), `get_active_subscribers()` (subscribers minus suppression), `suppress_email()` / `unsuppress_email()`, `log_send()` / `get_send_logs()`.
+
+---
+
+### `tokens.py` — Signed Unsubscribe Tokens
+
+Each email carries `{BASE_URL}/unsubscribe/<token>`, where the token is the recipient's email signed with `SECRET_KEY` (via `itsdangerous`). Links can't be forged and no DB lookup is needed to mint one.
+
+> ⚠️ Changing `SECRET_KEY` invalidates every unsubscribe link already sent out.
+
+---
+
 ### `pantrysoft_mock.py` — User List (Mock API)
 
-Simulates a call to the PantrySoft API.
+Recipient source. If any subscribers have been imported, it returns them from the database (minus the suppression list); otherwise it falls back to `mock_users.json` so the demo still works.
 
 **`get_optin_recipients()`** — returns a list of full user dicts for opted-in users  
 **`get_optin_emails()`** — convenience wrapper, returns just the email addresses
 
-> **To connect real PantrySoft API:** replace only this file. `app.py` and `email_sender.py` do not need any changes.
+> **To connect real PantrySoft API:** replace only this file's `get_optin_recipients()`. `app.py` and `email_sender.py` do not need any changes.
 
 ---
 
@@ -235,10 +266,13 @@ SMTP_SERVER   = os.environ.get("SMTP_SERVER",   "smtp.gmail.com")
 SMTP_PORT     = int(os.environ.get("SMTP_PORT", "465"))   # 465=SSL, 587=STARTTLS
 SMTP_USER     = os.environ.get("SMTP_USER",     "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")       # \xa0 auto-stripped
-FROM_EMAIL    = os.environ.get("SMTP_USER",     "")       # follows SMTP_USER
+FROM_EMAIL    = os.environ.get("FROM_EMAIL", "") or SMTP_USER  # falls back to SMTP_USER
 FROM_NAME     = "Bear Pantry – Bears Share"
 SECRET_KEY    = os.environ.get("SECRET_KEY",    "dev-secret-key-change-in-production")
 ACCESS_CODE   = os.environ.get("ACCESS_CODE",   "")       # optional form gate
+DATABASE_URL  = os.environ.get("DATABASE_URL",  "sqlite:///bears_share.db")
+BASE_URL      = os.environ.get("BASE_URL",      "http://localhost:5000")
+PHYSICAL_ADDRESS = os.environ.get("PHYSICAL_ADDRESS", "Bear Pantry, MSU, ...")  # CAN-SPAM footer
 ```
 
 > ⚠️ **Never commit real credentials to Git.** Set all secrets as environment variables in Render (or export them locally). `config.py` itself contains no credentials.
@@ -322,7 +356,7 @@ python app.py
 
 Expected terminal output:
 ```
-Bears Share Demo running at http://localhost:5000
+Bears Share running at http://localhost:5000
  * Running on http://127.0.0.1:5000
 ```
 
