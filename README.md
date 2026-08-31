@@ -288,7 +288,7 @@ Staff-facing page. Fields:
 | Building Name | text input | ✅ | e.g. "Plaster Student Union" |
 | Room Number | text input | ✅ | e.g. "Room 203" |
 | What food is available? | textarea | ✅ | Multi-line, resizable |
-| Food Available Until | datetime-local | ✅ | Hint: students have 20 min after |
+| Food Available Until | datetime-local | ✅ | Pickup deadline |
 | Additional Notes | textarea | ❌ | Optional; e.g. dietary info |
 
 - Shows an inline red error box if required fields are missing
