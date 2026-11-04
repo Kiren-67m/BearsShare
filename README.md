@@ -1,4 +1,6 @@
-# BearsShare — Food Notification Prototype
+# BearsShare — MSU Project
+
+**MSU campus project · Flask application prototype**
 
 A Flask application built as a demo for Missouri State University's Bear Pantry. Staff enter a food pickup notice; the app sends email to opted-in subscribers and records the broadcast.
 
@@ -61,3 +63,4 @@ Open `http://localhost:5000`. Use an email sandbox and the bundled mock recipien
 The optional access code is a demo gate, not a complete identity or authorization system. Production use would require a review of authentication, CSRF protection, access to history, logging of recipient information and email-provider requirements. Keep subscriber exports, credentials and local databases out of Git.
 
 [Detailed setup and operations guide](OPERATIONS.md) — deployment configuration, SMTP providers, route descriptions and troubleshooting. The guide preserves the project's original implementation notes.
+
